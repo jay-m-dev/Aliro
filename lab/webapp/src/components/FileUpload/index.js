@@ -2448,7 +2448,6 @@ handleCatFeaturesUserTextCancel() {
         <Modal.Content>{this.state.errorModalContent}</Modal.Content>
 
 
-
       </Modal>
       )
     }
