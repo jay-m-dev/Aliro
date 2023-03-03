@@ -2,7 +2,7 @@ GET http://localhost:5080/openai/v1/configs
 
 ###
 
-GET http://localhost:5080/openai/v1/configs/63ffa8f9fe67714b24cf5106
+GET http://localhost:5080/openai/v1/configs/6400d8e639c29c49f83d71d2
 
 ###
 

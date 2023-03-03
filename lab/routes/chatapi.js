@@ -24,6 +24,18 @@ router.post('/chatlogs', async (req, res) => {
         return res.status(400).json({ message: 'Must provide a who' });
     }
 
+    // find an existing chat by _chat_id
+    // if it does not exist, return an error
+    let chat;
+    try {
+        chat = await Chat.findById(req.body._chat_id)
+        if (chat == null) {
+            return res.status(404).json({ message: 'Cannot find chat: ' + req.body._chat_id });
+        }
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+
     const chatlog = new ChatLog({
         _chat_id: req.body._chat_id,
         message: req.body.message,

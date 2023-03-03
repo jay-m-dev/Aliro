@@ -116,6 +116,11 @@ types:
           application/json:
             type: object
             example: { message: 'Must provide a _chat_id' }
+      404:
+        body:
+          application/json:
+            type: object
+            example: { message: 'Cannot find chat: 63f7bc2da70e99abe4e83b9c' }
   /{id}:
     patch:
       description: Update a specific chatlog entry
