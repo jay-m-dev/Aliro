@@ -1,35 +1,46 @@
 # Raspberry Pi OS Setup Instructions
-1. Use the raspberry pi imager to write Raspberry Pi OS Lite (64-bit) onto an sd card
-2. Boot the Raspberry Pi OS   
-**NOTE:** The following steps require that the Raspberry Pi have an active internet connection.
-Wifi can be configured by running `sudo raspi-config` and setting up the **Wireless LAN** in **System Options**.
-3. Run install.sh
-  a. verify that docker is installed. Run `docker --version`
-4. Copy the ./Aliro/raspberrypi/intropage directory into the root directory (/intropage)
-5. Open the chromium-browser (`right-click the desktop and open the web browser`)
-6. Configure the browser to open a custom page when it starts `file:///home/aliroed/intropage/index.html`
-4. Add the line in the `autostart` file in the existing `/etc/xdg/openbox/autostart` file.  
-**Note:** if the `autostart` file doesn't exist, you can copy the one here as-is.
-5. Download the `Aliro-*.zip` file from the GitHub release page into the home directory. (`~/Alizo-*.zip`)
-6. unzip the `.zip` file
-7. Move the contents of the `~/target/production/Aliro-*/` directory into `/aliro/` (`mkdir /aliro` first)
-8. Change directory into the aliro directory `cd /aliro` and run `docker compose pull`  
-9. run the `docker_compress.sh` script to compress the pulled docker images.  
-Check that the images were saved in the `/images` directory, you should see 3 .tar.gz files:  
-`aliro_dbmongo.tar.gz`  
-`aliro_lab.tar.gz`  
-`aliro_machine.tar.gz`  
-10. Remove the pulled docker images by running the `docker_prune.sh` script. This will greatly reduce
-the space used by the images.
-11. copy the aliroed-compose.service file in /etc/systemd/system/ (`sudo cp aliroed-compose.service /etc/systemd/system/`
-12. enable the aliroed-compose service with `sudo systemctl enable aliroed-compose.service`
+## Required Tools
+- A Raspberry Pi 4 (**Pi**)
+- A PC where you can download and run the official Raspberry Pi Imager (**Imager**)
+- A MicroSD Card with at least 16GB of space.
+- An external USB Flash Drive with at least 4GB of space.
+## On your local computer
+1. Download the official **Imager** and use it to burn a copy of the Raspberry Pi OS Lite (64-bit) on your MicroSD Card.
+- The **Imager** will let you configure these settings:
+  - hostname: **aliroed**
+  - username: **aliroed**
+  - password: **aliroed**
+  - Network settings: it is recommended to configure this temporarily, we'll remove this config at a later step.
+2. Download the **Aliro-*.zip file from the latest GitHub Release.
+3. Copy the **raspberrypi** directory (the one that contains this Readme file) onto your USB Flash Drive.
+4. Copy the downloaded **Aliro-*.zip** file onto your USB Flash Drive.
 
-# not sure if the next steps will be necessary
-12. Remove any unused kernels:
-use `uname -r` to check the current kernel in use  
-use `dpkg -l | grep linux-image` to see a list of installed kernels
-remove the ones we don't need with `sudo apt purge linux-image-<kernel-name>`
-14. run clean.sh
+## On the Raspberry Pi.
+1. Insert the MicroSD Card in the **Pi** and boot it up.
+2. Login to the **Pi** as user **aliroed**.
+3. Insert the USB Flash Drive on an available USB Port. Mount it manually on `/mnt/usb/`, if it's not automounted
+4. Ensure the Pi is connected to the internet (run `$ sudo raspi-config` to configure if necessary)
+5. Copy the scripts into the **home** directory: `$ cp /mnt/usb/raspberrypi/build_rpi/scripts/*.sh ~`
+** Run the following commands from the **home** directory (`$ cd ~`)
+6. Run `$ ./setup_dirs.sh`
+7. Unzip the **Aliro-*.zip**
+8. Copy the main contents of Aliro into **/aliroed** with `$ cp -r target/production/Aliro-x.yy/* /aliroed/` (replace x.yy with the actual Aliro version)
+9. Copy the files in the **data** directory: `$ cp /mnt/usb/raspberrypi/build_rpi/data/* /aliroed/data/datasets/user`
+10. Run `$ ./install.sh`
+11. Check that docker was installed: `$ docker --version`
+12. Run `$ docker compose -f /aliroed/docker-compose.yml pull`
+13. Run `$ ./docker_compress.sh`
+14. Copy the services: `$ sudo cp /mnt/usb/raspberrypi/build_rpi/services/* /etc/systemd/system`
+15. Enable each service:
+- `$ sudo systemctl enable aliroed-load.service`
+- `$ sudo systemctl enable aliroed-compose.service`
+16. Run `$ ./browser_setup.sh`
+17. Run `$ ./docker_prune.sh`
+18. Run `$ ./cleanup.sh`
+
+If Everything went well, the custom OS should be ready, at this point you could proceed with the steps to build the aliro-imager.exe
+But it's a good idea to test that this process worked by launching Booting up the OS.  
+**Note:** After
 
 # Building the aliro-image executable
 ## Windows

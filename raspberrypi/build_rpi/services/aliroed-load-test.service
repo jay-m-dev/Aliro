@@ -1,0 +1,14 @@
+[Unit]
+Description=AliroEd Load Service
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/aliroed/images
+ExecStart=/usr/bin/docker load -i aliro_dbmongo.tar.gz
+ExecStart=/usr/bin/docker load -i aliro_lab.tar.gz
+ExecStart=/usr/bin/docker load -i aliro_machine.tar.gz
+
+[Install]
+WantedBy=multi-user.target

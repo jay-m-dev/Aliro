@@ -5,7 +5,7 @@ Requires=docker.service
 
 [Service]
 Restart=always
-WorkingDirectory=/target/production/Aliro-0.21
+WorkingDirectory=/aliroed
 ExecStart=/usr/bin/docker compose up -d
 
 [Install]

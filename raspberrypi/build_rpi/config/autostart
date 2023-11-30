@@ -1,0 +1,2 @@
+# Add this line at the bottom of the /etc/xdg/openbox/ file
+chromium-browser --start-maximized 'file:///aliroed/intropage/index.html'

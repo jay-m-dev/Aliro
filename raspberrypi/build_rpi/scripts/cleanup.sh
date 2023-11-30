@@ -13,9 +13,10 @@ sudo apt purge htop
 sudo apt autoremove -y
 sudo apt autoclean -y
 sudo apt clean -y
+# clean up logs
 sudo journalctl --vacuum-time=7d
-docker builder prune --all
 rm ~/get-docker.sh
+# remove remaining logs
 sudo rm -rf /var/log/*
 sudo rm -rf /tmp/*
 # clear bash history
