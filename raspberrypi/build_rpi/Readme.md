@@ -11,37 +11,60 @@
   - username: **aliroed**
   - password: **aliroed**
   - Network settings: it is recommended to configure this temporarily, we'll remove this config at a later step.
-2. Download the **Aliro-*.zip file from the latest GitHub Release.
-3. Copy the **raspberrypi** directory (the one that contains this Readme file) onto your USB Flash Drive.
-4. Copy the downloaded **Aliro-*.zip** file onto your USB Flash Drive.
+  - Locale settings: Set a timezone and make sure the keyboard layout is set to **us**.
+2. Download the **Aliro-*.zip file from the latest GitHub Release
+3. Assuming your USB Flash Drive was mounted to **/mnt/usb**:
+- `$ unzip Aliro-*.zip`
+- `$ mkdir /mnt/usb/aliroed`
+- `$ cp -r target/production/Aliro-*/* /mnt/usb/aliroed`
+- `$ cp -r target/production/Aliro-*/.env /mnt/usb/aliroed` (hidden files need to be copied separately)
+4. Copy the contents of this **raspberrypi** directory (the one that contains this Readme file) onto your USB Flash Drive:
+- `$ mkdir /mnt/usb/config && cp raspberrypi/build_rpi/config/* /mnt/usb/config/`
+- `$ mkdir /mnt/usb/scripts && cp raspberrypi/build_rpi/scripts/* /mnt/usb/scripts/`
+- `$ mkdir /mnt/usb/services && cp raspberrypi/build_rpi/scripts/* /mnt/usb/services/`
+- `$ mkdir /mnt/usb/data && cp raspberrypi/data/* /mnt/usb/aliroed/data/datasets/user/`
+- `$ mkdir /mnt/usb/intropage && cp -r raspberrypi/intropage /mnt/usb/intropage`
+5. Unmount the USB Flash Drive and have it ready to plug in to the **Pi**
 
 ## On the Raspberry Pi.
 1. Insert the MicroSD Card in the **Pi** and boot it up.
-2. Login to the **Pi** as user **aliroed**.
+2. Login to the **Pi** as user **aliroed** 
 3. Insert the USB Flash Drive on an available USB Port. Mount it manually on `/mnt/usb/`, if it's not automounted
 4. Ensure the Pi is connected to the internet (run `$ sudo raspi-config` to configure if necessary)
-5. Copy the scripts into the **home** directory: `$ cp /mnt/usb/raspberrypi/build_rpi/scripts/*.sh ~`
-** Run the following commands from the **home** directory (`$ cd ~`)
-6. Run `$ ./setup_dirs.sh`
-7. Unzip the **Aliro-*.zip**
-8. Copy the main contents of Aliro into **/aliroed** with `$ cp -r target/production/Aliro-x.yy/* /aliroed/` (replace x.yy with the actual Aliro version)
-9. Copy the files in the **data** directory: `$ cp /mnt/usb/raspberrypi/build_rpi/data/* /aliroed/data/datasets/user`
-10. Run `$ ./install.sh`
-11. Check that docker was installed: `$ docker --version`
-12. Run `$ docker compose -f /aliroed/docker-compose.yml pull`
-13. Run `$ ./docker_compress.sh`
-14. Copy the services: `$ sudo cp /mnt/usb/raspberrypi/build_rpi/services/* /etc/systemd/system`
-15. Enable each service:
-- `$ sudo systemctl enable aliroed-load.service`
+5. Run these commands:
+- `$ cp /mnt/usb/scripts/*.sh /home/aliroed/`
+- `$ ./setup_dirs.sh`
+- `$ cp -r /mnt/usb/aliroed/* /aliroed/`
+- `$ cp /mnt/usb/aliroed/.env /aliroed` (hidden files need to be copied separately)
+- `$ ./install.sh`
+6. Check that docker was installed: `$ docker --version`
+7. Configure the docker images
+- `$ docker compose -f /aliroed/docker-compose.yml pulludos
+- `$ ./docker_compress.sh` (This step will take a few minutes)
+- `$ sudo cp /mnt/usb/services/* /etc/systemd/system/`
+8. Enable services.**Note:** Do **not** enable the `aliroed-load.service` yet.
+- `$ sudo systemctl enable aliroed-load-test.service`
 - `$ sudo systemctl enable aliroed-compose.service`
-16. Run `$ ./browser_setup.sh`
-17. Run `$ ./docker_prune.sh`
-18. Run `$ ./cleanup.sh`
+- `$ sudo cp /mnt/usb/config/autostart /etc/xdg/openbox/`
+- `$ ./docker_prune.sh`
+- `$ ./cleanup.sh`
+9. run `sudo raspi-config` and enable **System Options > Desktop Autologin**
+10. Reboot the **Pi** and test that everything works as expected
+11. Configure the Chromium Web browser by setting the `/intropage/index.html` as the **homepage**, add a **bookmark**
+to this page and show the Bookmarks Bar, and in Settings, configure this page to be launched **On Startup**.
+12. After testing that everything works, run:
+- `$ sudo systemctl disable aliroed-load-test.service`
+- `$ sudo rm /etc/systemd/system/alrioed-load-test.service`
+- `$ sudo systemctl enable aliroed-load.service`
+13. Clean up again:
+- `$ ./docker_prune.sh`
+- `$ ./cleanup.sh`
 
-If Everything went well, the custom OS should be ready, at this point you could proceed with the steps to build the aliro-imager.exe
-But it's a good idea to test that this process worked by launching Booting up the OS.  
-**Note:** After
-
+## Extract, Shrink and Compress the MicroSD Card image
+1. Extract the image into a **.img** file with a tool like **dd**: `sudo dd if=/dev/sdX of=aliroed.img bs=4M`
+2. Use PiShrink to shrink the image. The image should also be compressed with **xz**. There are 2 options for this: `sudo ./pishrink.sh aliroed.img`
+   a. use PiShrink with the -Z option, or
+   b. use the `xz` utility independently: `xz -9 aliroed.img` (**Note: This option has worked best so far**)
 # Building the aliro-image executable
 ## Windows
 Perform these steps after performing the steps in Linux to extract the .img file, shrinking with PiShrink and compressing with xz.
@@ -52,8 +75,3 @@ These steps work on a Windows 11 machine:
 4. Configure the version number as needed. The current scheme is to use the version of the latest Aliro Release (e.g. 0.21)
 5. Proceed to `Build All Projects` in Qt Creator
 6. Use `nsis-binary-7336-1` to build the installer, using the **aliro-imager.nsi** script output by the Qt Creator build.
-## Linux
-1. Extract the image into a **.img** file with a tool like **dd**: `sudo dd if=/dev/sdX of=aliroed.img bs=4M`
-2. Use PiShrink to shrink the image. The image should also be compressed with **xz**. There are 2 options for this: `sudo ./pishrink.sh aliroed.img`
-    a. use PiShrink with the -Z option, or 
-    b. use the `xz` utility independently: `xz -9 aliroed.img` (**Note: This option has worked best so far**)

@@ -19,6 +19,8 @@ rm ~/get-docker.sh
 # remove remaining logs
 sudo rm -rf /var/log/*
 sudo rm -rf /tmp/*
+# remove scripts
+rm /home/aliroed/*.sh
 # clear bash history
 history -c
 

@@ -5,6 +5,7 @@ Requires=docker.service
 
 [Service]
 Restart=always
+RestartSec=30
 WorkingDirectory=/aliroed
 ExecStart=/usr/bin/docker compose up -d
 
